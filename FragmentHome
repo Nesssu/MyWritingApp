@@ -1,0 +1,80 @@
+package com.example.mywritngapp;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import java.util.Locale;
+import java.util.Objects;
+
+public class FragmentHome extends Fragment {
+    private final DataHolder dataHolder = DataHolder.getInstance();
+    private FragmentAListener listener;
+    private EditText editTextWriting;
+    private EditText editTextReading;
+    public interface FragmentAListener {}
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_home, container, false);
+        editTextReading = v.findViewById(R.id.editTextReading);
+        editTextWriting = v.findViewById(R.id.editTextWriting);
+        TextView textViewDisplay = v.findViewById(R.id.textViewDisplay);
+        if (Boolean.compare(dataHolder.getChoice(), false) == 0) {
+            editTextWriting.setInputType(InputType.TYPE_NULL);
+            editTextReading.setText(dataHolder.getText());
+        } else {
+            editTextReading.setText("");
+            editTextWriting.setInputType(InputType.TYPE_CLASS_TEXT);
+            editTextWriting.setSingleLine(false);
+        }
+        editTextWriting.getLayoutParams().width = 700;
+        editTextWriting.getLayoutParams().height = 600;
+        editTextReading.setTextSize(dataHolder.getFontSize());
+        editTextReading.setLines(dataHolder.getLines());
+        editTextReading.getLayoutParams().width = dataHolder.getWidth();
+        editTextReading.getLayoutParams().height = dataHolder.getHeight();
+        textViewDisplay.setText(dataHolder.getDisplayText());
+        return v;
+    }
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        editTextReading.setInputType(InputType.TYPE_NULL);
+        editTextWriting.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                dataHolder.setText(s); }
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof FragmentAListener) {
+            listener = (FragmentAListener) context;
+        }
+    }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+}
